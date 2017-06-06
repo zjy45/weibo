@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>我的微博首页</title>
+    <style>
+        nav {
+            background: black;
+        }
+
+        a.gua-nav-item {
+            /* 设置 inlin-block, 这样才能设置 a 的尺寸和 padding */
+            display: inline-block;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        /* 鼠标移上去的时候, 设置新颜色 */
+        .gua-nav-item:hover {
+            background-color: white;
+            color: black;
+            /* 鼠标指针变为链接手 */
+            cursor: pointer;
+        }
+
+        .head-img {
+            width: 25px;
+            height: 25px;
+        }
+
+    </style>
+</head>
+<body>
+<div>
+    <nav>
+        <img src="/static/img/WB_logo.png">
+        <a class="gua-nav-item" href={{url_for('.index')}}>首页</a>
+        <a class="gua-nav-item"href={{url_for('index.profile')}}>{{U.username| default('请登录')}}</a>
+        <a class="gua-nav-item" href="#">关于</a>
+    </nav>
+</div>
+<div>.............................................</div>
+<div>
+    <form  action="{{ url_for('.register') }}" method="post">
+      <input type="text" name="username" placeholder="用户名">
+      <input type="text" name="password" placeholder="密码">
+      <button name="button">注册</button>
+    </form>
+    <form  action="{{ url_for('.login') }}" method="post">
+      <input type="text" name="username" placeholder="用户名">
+      <input type="text" name="password" placeholder="密码">
+      <button name="button">登录</button>
+    </form>
+</div>
+<a href={{url_for('.new')}}>添加微博</a>
+<div>
+    {% for w in weibo %}
+    <div class="weibo-list">
+        <a>
+            <img class=head-img src={{ '/uploads/' + w.user().user_image + '?v=3&amp;s=120' }}title="atian25"/>
+        </a>
+        {{w.user().username}}
+        <div>
+            {{w.title}}
+        </div>
+        <div>
+            {{w.content}}
+        </div>
+        <form method="post" action={{url_for('reply.add', w_id=w.id)}}>
+            <input type="text" name="content" placeholder="评论内容">
+            <button>评论</button>
+        </form>
+        {% for r in w.replys() %}
+        <div>
+            {{r.content}} @ {{ r.user().username }}
+            <form method="post" action={{url_for('reply.update', reply_id=r.id)}}>
+                <input type="text" name="content" placeholder="编辑评论">
+                <button>编辑</button>
+            </form>
+            <a href={{ url_for('reply.delete', reply_id=r.id)}}>删除评论</a>
+        </div>
+        <a href="{{ url_for('.delete', id=w.id)}}">删除</a>
+        {% endfor %}
+    </div>
+    {% endfor %}
+</div>
+<script src="/static/js/api.js"></script>
+<script src="/static/js/weibo.js"></script>
+</body>
+</html>
